@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>矯正歯科専門医 研修履歴管理システム ver3.3</title>
+    <title>矯正歯科専門医 研修履歴管理システム ver3.3.2</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -67,7 +67,7 @@
     <div class="max-w-6xl mx-auto px-4">
         <div class="bg-white rounded-lg shadow-lg p-8">
             <h1 class="text-3xl font-bold text-center text-blue-800 mb-8">
-                <i class="fas fa-tooth mr-3"></i>矯正歯科専門医 研修履歴管理システム ver3.3
+                <i class="fas fa-tooth mr-3"></i>矯正歯科専門医 研修履歴管理システム ver3.3.2
             </h1>
 
             <!-- 基本設定セクション -->
@@ -331,7 +331,7 @@
                 } else {
                     requiredUnits = '10単位以上';
                     if (currentApplicationYear >= 2029) {
-                        fieldRequirement = '①～⑤の研修項目から各1分野から１単位以上を取得することが必須<br>そのうち①医療倫理、②患者・医療者関係の構築、⑤医療関連法規・医療経済については、専門医機構主催の共通研修で各1単位（合計3単位）の受講が必須';
+                        fieldRequirement = '①～⑤the研修項目から各1分野から１単位以上を取得することが必須<br>そのうち①医療倫理、②患者・医療者関係の構築、⑤医療関連法規・医療経済については、専門医機構主催の共通研修で各1単位（合計3単位）の受講が必須';
                     } else {
                         fieldRequirement = '各分野から1単位以上必須';
                     }
@@ -519,23 +519,95 @@
         function recognizeTrainingInfo(text) {
             const result = { year: null, field: -1, confidence: 0 };
             
-            // 年度認識（2020-2035年の範囲）
-            const yearRegex = /(20[2-3][0-9])年?度?/g;
-            let yearMatch;
-            const years = [];
-            while ((yearMatch = yearRegex.exec(text)) !== null) {
-                const year = parseInt(yearMatch[1]);
-                if (year >= 2020 && year <= 2035) {
-                    years.push(year);
+            // 正確な年度認識（日本の年度制に対応）
+            let fiscalYear = null;
+            
+            // より詳細な日付パターンを検索
+            const datePatterns = [
+                // 基本的な日付パターン
+                /(20[2-3][0-9])年\s*([0-1]?[0-9])\s*月\s*([0-3]?[0-9])\s*日/g,
+                /(20[2-3][0-9])\/([0-1]?[0-9])\/([0-3]?[0-9])/g,
+                /(20[2-3][0-9])-([0-1]?[0-9])-([0-3]?[0-9])/g,
+                /(20[2-3][0-9])\.([0-1]?[0-9])\.([0-3]?[0-9])/g,
+                // 月が先に来るパターン
+                /([0-1]?[0-9])月\s*([0-3]?[0-9])日.*?(20[2-3][0-9])年/g,
+                // 年月のみのパターン
+                /(20[2-3][0-9])年\s*([0-1]?[0-9])\s*月/g
+            ];
+            
+            const foundDates = [];
+            
+            datePatterns.forEach((pattern, patternIndex) => {
+                let match;
+                while ((match = pattern.exec(text)) !== null) {
+                    let year, month;
+                    
+                    if (patternIndex === 4) {
+                        // 月日年の順序パターン
+                        month = parseInt(match[1]);
+                        year = parseInt(match[3]);
+                    } else {
+                        // 通常の年月日パターン
+                        year = parseInt(match[1]);
+                        month = parseInt(match[2]);
+                    }
+                    
+                    // 有効な年月かチェック
+                    if (year >= 2020 && year <= 2040 && month >= 1 && month <= 12) {
+                        // 日本の年度計算を正確に実行
+                        let calculatedFiscalYear;
+                        if (month >= 1 && month <= 3) {
+                            // 1-3月は前年度
+                            calculatedFiscalYear = year - 1;
+                        } else if (month >= 4 && month <= 12) {
+                            // 4-12月は当年度
+                            calculatedFiscalYear = year;
+                        }
+                        
+                        foundDates.push({
+                            originalYear: year,
+                            month: month,
+                            fiscalYear: calculatedFiscalYear,
+                            confidence: 1.0
+                        });
+                    }
+                }
+            });
+            
+            // 最も新しい有効な日付を選択
+            if (foundDates.length > 0) {
+                const bestDate = foundDates.reduce((best, current) => {
+                    if (current.originalYear > best.originalYear) return current;
+                    if (current.originalYear === best.originalYear && current.month > best.month) return current;
+                    return best;
+                });
+                fiscalYear = bestDate.fiscalYear;
+            } else {
+                // 日付が見つからない場合、年度表記を直接検索
+                const yearOnlyPatterns = [
+                    /(20[2-3][0-9])年度/g,
+                    /(20[2-3][0-9])年/g
+                ];
+                
+                const foundYears = [];
+                yearOnlyPatterns.forEach(pattern => {
+                    let match;
+                    while ((match = pattern.exec(text)) !== null) {
+                        const year = parseInt(match[1]);
+                        if (year >= 2020 && year <= 2040) {
+                            foundYears.push(year);
+                        }
+                    }
+                });
+                
+                if (foundYears.length > 0) {
+                    fiscalYear = Math.max(...foundYears);
                 }
             }
             
-            if (years.length > 0) {
-                // 最も新しい年を選択
-                result.year = Math.max(...years);
-            }
+            result.year = fiscalYear;
 
-            // 高精度分野認識
+            // 高精度分野認識（既存のロジックを維持）
             let maxScore = 0;
             let bestField = -1;
 
@@ -607,7 +679,7 @@
             
             const confidence = Math.round(recognition.confidence * 100);
             
-            if (confirm(`${fileName}\n\n認識結果:\n年度: ${recognition.year}年\n分野: ①${fieldName}\n信頼度: ${confidence}%\n\nこの内容で研修履歴に追加しますか？`)) {
+            if (confirm(`${fileName}\n\n認識結果:\n年度: ${recognition.year}年度\n分野: ①${fieldName}\n信頼度: ${confidence}%\n\nこの内容で研修履歴に追加しますか？`)) {
                 // 該当するチェックボックスを探してチェック
                 const checkbox = document.querySelector(`input[data-year="${recognition.year}"][data-field="${recognition.field}"]`);
                 if (checkbox) {
@@ -816,9 +888,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDk8puyTGbm6gBJq90k%2BitwqSKF72IOMicgIVCKUH%2FeJNxTKohy0nrDiyLnAhgyCCbkfO9sQwspl4v8LEdnR%2F%2FBL%2Bk8%2FoaOYPsJy%2BZ%2FGOtYwU1NKurKaR2u2V8iWOorXIcH%2B0K%2FAXpWWEDy5Tt2harAf5%2FxPWEJCdcegdMPXkejJzRIgayaBgxBwIHW%2BBuUKWf5XFiWwEKkzRlbeHp8DD3ZaefbKfcMNf%2BSJo89S1x88jEH3IZUREQSJJ%2FoR9nJ5O3RufeOVA7EgXHk4pIZ57hXMC0SGsLqXHrgQkdd3%2BMOtl45vLMc%2F7T6Zlecsm%2FpF9c52DFYX%2FLSrCTaVW79gpkoTm5V6y18bJUXP5kICO2CJplOLvUDkbXCNV9D45tBhEOfMQJ6l1sjNaSNShEVX3DxPrInnlBGGQB9p00CU4PSpNKc9sCUo2O2KVBUK4XvrhqFxzRElO5O%2B6WxMyxhBh0UoKvJWXT1Akr6j2M9Vt%2FAFtAy4o6EN5S58mKAaxGW4xq%2FAXkMtPDGPZy1WBI%2FpTtSHPie0NoBGRdkXrqYgn6MV2";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDkd6nlmQbuDDt5YAyR3FRd0iXjbnaIf%2BFAdoGouRZCagO%2FR8IeohDWBRLuP4P4QzHR8Zaj9FGyHyEmACE9Lc5tpkur7unN1zhMesApLtgFCvDNBscx3km9Um%2FklDvREXsaniW%2FV3VK%2FW7PXRsREpPftIJnRu9O7XIIltWfkbfKJSRcpTmN3%2BzE4hD%2B38i9u8M4aa9%2F%2BdNHg6k8rj4a9sSstLz6MygekalTSvkfzJpYH252dtjtjHfgh9PvP79vo5lGH%2FANRZtbJiLm%2BgIQL3XlKQ6XmFYZGL0xyzGHQcdPT0X1TlSRxigWNDvwcf1V4pSQzpW5HwnF%2Bce7EsHK5nDyJ9OqMzmZt0zEWxYv%2B%2BBz4bxccv5VK0lY45kZuGetnzvq%2BoANGprerDRL6GoUs1JSZnBlpzGmgG7fUtndFiI4xKt38CxF%2Bgrn2%2FFGfqBxY0IJX9a%2BaSbLGllLztZR2EKYal24ZGQFfTFXXGHfcLzBQ4WU7e0mpoKokrslWtBdkLgT6uOy7Kz7SBscFUISp0DWpcrj2Vfe%2BMQg8%2BPQTtUh3Xn9w9PVVvMcbsnvkuBlQlzA%3D%3D";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDk8puyTGbm6gBJq90k+itwqSKF72IOMicgIVCKUH/eJNxTKohy0nrDiyLnAhgyCCbkfO9sQwspl4v8LEdnR//BL+k8/oaOYPsJy+Z/GOtYwU1NKurKaR2u2V8iWOorXIcH+0K/AXpWWEDy5Tt2harAf5/xPWEJCdcegdMPXkejJzRIgayaBgxBwIHW+BuUKWf5XFiWwEKkzRlbeHp8DD3ZaefbKfcMNf+SJo89S1x88jEH3IZUREQSJJ/oR9nJ5O3RufeOVA7EgXHk4pIZ57hXMC0SGsLqXHrgQkdd3+MOtl45vLMc/7T6Zlecsm/pF9c52DFYX/LSrCTaVW79gpkoTm5V6y18bJUXP5kICO2CJplOLvUDkbXCNV9D45tBhEOfMQJ6l1sjNaSNShEVX3DxPrInnlBGGQB9p00CU4PSpNKc9sCUo2O2KVBUK4XvrhqFxzRElO5O+6WxMyxhBh0UoKvJWXT1Akr6j2M9Vt/AFtAy4o6EN5S58mKAaxGW4xq/AXkMtPDGPZy1WBI/pTtSHPie0NoBGRdkXrqYgn6MV2";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDkd6nlmQbuDDt5YAyR3FRd0iXjbnaIf+FAdoGouRZCagO/R8IeohDWBRLuP4P4QzHR8Zaj9FGyHyEmACE9Lc5tpkur7unN1zhMesApLtgFCvDNBscx3km9Um/klDvREXsaniW/V3VK/W7PXRsREpPftIJnRu9O7XIIltWfkbfKJSRcpTmN3+zE4hD+38i9u8M4aa9/+dNHg6k8rj4a9sSstLz6MygekalTSvkfzJpYH252dtjtjHfgh9PvP79vo5lGH/ANRZtbJiLm+gIQL3XlKQ6XmFYZGL0xyzGHQcdPT0X1TlSRxigWNDvwcf1V4pSQzpW5HwnF+ce7EsHK5nDyJ9OqMzmZt0zEWxYv++Bz4bxccv5VK0lY45kZuGetnzvq+oANGprerDRL6GoUs1JSZnBlpzGmgG7fUtndFiI4xKt38CxF+grn2/FGfqBxY0IJX9a+aSbLGllLztZR2EKYal24ZGQFfTFXXGHfcLzBQ4WU7e0mpoKokrslWtBdkLgT6uOy7Kz7SBscFUISp0DWpcrj2Vfe+MQg8+PQTtUh3Xn9w9PVVvMcbsnvkuBlQlzA==";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
