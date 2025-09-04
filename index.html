@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>矯正歯科専門医 研修履歴管理システム ver3.3.3</title>
+    <title>矯正歯科専門医 研修履歴管理システム ver3.3.4</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -67,7 +67,7 @@
     <div class="max-w-6xl mx-auto px-4">
         <div class="bg-white rounded-lg shadow-lg p-8">
             <h1 class="text-3xl font-bold text-center text-blue-800 mb-2">
-                <i class="fas fa-tooth mr-3"></i>矯正歯科専門医 研修履歴管理システム ver3.3.3
+                <i class="fas fa-tooth mr-3"></i>矯正歯科専門医 研修履歴管理システム ver3.3.4
             </h1>
             
             <p class="text-center text-sm text-gray-600 mb-8">
@@ -112,6 +112,10 @@
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">
                     <i class="fas fa-table mr-2"></i>研修履歴入力
                 </h2>
+
+                <p class="text-sm text-gray-600 mb-6">
+                    ※追加研修は受講日と認定年度が異なる可能性があるため、手入力をしてください。
+                </p>
 
                 <!-- PDF自動認識エリア -->
                 <div class="mb-6">
@@ -335,7 +339,7 @@
                 } else {
                     requiredUnits = '10単位以上';
                     if (currentApplicationYear >= 2029) {
-                        fieldRequirement = '①～⑤the研修項目から各1分野から１単位以上を取得することが必須<br>そのうち①医療倫理、②患者・医療者関係の構築、⑤医療関連法規・医療経済については、専門医機構主催の共通研修で各1単位（合計3単位）の受講が必須';
+                        fieldRequirement = '①～⑤共通研修項目から各1分野から１単位以上を取得することが必須<br>そのうち①医療倫理、②患者・医療者関係の構築、⑤医療関連法規・医療経済については、専門医機構主催の共通研修で各1単位（合計3単位）の受講が必須';
                     } else {
                         fieldRequirement = '各分野から1単位以上必須';
                     }
@@ -892,9 +896,9 @@
 </html>
     <script id="html_badge_script1">
         window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
-            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDmVLdzBA9GOJS2OUbo0oQsDM4qKomvRo9K7zlzclquBhPgOGqx%2BDoaQ2kKuTcbJNo1IYMIu8X079Tzc38M9ZVKLc6IMRjuST20s8iUvAkNoUsIX8CQyRG9D4RP8M1RxJrCOwiM6k%2Bs%2BiQiH1dEMCVPmUSzIWBXFP5H4iCP1RP2oWnk6XslKrCO%2BGmfUi%2FLKDJreCq6PAkYSjPIEiBFKWmo0CCJUyLot6UcOvQbA32L%2FtI1TY%2FVtPEFsuZB7vlKB9N7V9553Aar3itVPHHPPDQ0UOge8EWNRaBTTtQ51Ne3EgCObbV0E5TJw35oB%2FQceAcIWh5VPY%2BYCbOxWF5hygVuyCoySrY05gRyfjt3S5wH5p7uFhrObsgE5kkU2PMXIllIpB%2BUGFC4jsPyCb5M9MWHYgm79lM77GoUWvSw0WODGI%2FqEHvY7OB75MDv4EdayMOu%2B2TKwaxdlotGd6cpA0c94APvpOMks9Mkdq2%2ForeF7aB7JiMAEdngjrM2te7lmoeGDzzG3tcJXFoYjvkaMXds0qbep%2Fh%2FUBumifeedxL26W";
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDjz8PmRlUhN3i8H7%2FL2Hk3JB94h%2BASdgqHZbF8brJobJRxUgnuR2UWhuTXl4WcyPeVF3%2FTP6v8XS7cYZP5NfAUPICl6GvmWCrYVXcL9qEW%2BRM27LegNO92B7jSqyAj0L43FadGxoRolOFerLiCFr8tJWIFOlT1MJxNxtyLePgX5gVTcTnFEn3z0d0Ku48UYRRMIUcshd1zkZgU2LM%2BKU3lk%2F7olVWCulC6lN6W0tMUUpVTOouMEeljnhb8QBNymHcORhKiTHJw4lVOLJDwPFmnnCKM9K%2Ft9Tg2DbPXfAYDelA7TJ51L%2BgXulwhCXuLkq5X24ARIjQ2oPWPaxHQBr7%2F2wXbAJFFvnFcLaUCJSp0WvIZQoPgKrPRd1uVIY0WytJ6bhoCmPFUz6M%2B9ni1xeZxA01YyXrv%2BkKVsH8ZPeY2p%2F70JIpX5Sn16iYb%2BP8PhIYSIKIJwjLlUU9D5X7xbk2eSuw5YIYFyB2pDoQOzBOg5kxdEQCtViz4IwdV351V4iNmDo8sCNeMel%2BAn%2Bq7zLPihUWmgtIuLyIgltg9Qlx%2F6H";
         window.__genspark_locale = "ja-JP";
-        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDmVLdzBA9GOJS2OUbo0oQsDM4qKomvRo9K7zlzclquBhPgOGqx+DoaQ2kKuTcbJNo1IYMIu8X079Tzc38M9ZVKLc6IMRjuST20s8iUvAkNoUsIX8CQyRG9D4RP8M1RxJrCOwiM6k+s+iQiH1dEMCVPmUSzIWBXFP5H4iCP1RP2oWnk6XslKrCO+GmfUi/LKDJreCq6PAkYSjPIEiBFKWmo0CCJUyLot6UcOvQbA32L/tI1TY/VtPEFsuZB7vlKB9N7V9553Aar3itVPHHPPDQ0UOge8EWNRaBTTtQ51Ne3EgCObbV0E5TJw35oB/QceAcIWh5VPY+YCbOxWF5hygVuyCoySrY05gRyfjt3S5wH5p7uFhrObsgE5kkU2PMXIllIpB+UGFC4jsPyCb5M9MWHYgm79lM77GoUWvSw0WODGI/qEHvY7OB75MDv4EdayMOu+2TKwaxdlotGd6cpA0c94APvpOMks9Mkdq2/oreF7aB7JiMAEdngjrM2te7lmoeGDzzG3tcJXFoYjvkaMXds0qbep/h/UBumifeedxL26W";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDjz8PmRlUhN3i8H7/L2Hk3JB94h+ASdgqHZbF8brJobJRxUgnuR2UWhuTXl4WcyPeVF3/TP6v8XS7cYZP5NfAUPICl6GvmWCrYVXcL9qEW+RM27LegNO92B7jSqyAj0L43FadGxoRolOFerLiCFr8tJWIFOlT1MJxNxtyLePgX5gVTcTnFEn3z0d0Ku48UYRRMIUcshd1zkZgU2LM+KU3lk/7olVWCulC6lN6W0tMUUpVTOouMEeljnhb8QBNymHcORhKiTHJw4lVOLJDwPFmnnCKM9K/t9Tg2DbPXfAYDelA7TJ51L+gXulwhCXuLkq5X24ARIjQ2oPWPaxHQBr7/2wXbAJFFvnFcLaUCJSp0WvIZQoPgKrPRd1uVIY0WytJ6bhoCmPFUz6M+9ni1xeZxA01YyXrv+kKVsH8ZPeY2p/70JIpX5Sn16iYb+P8PhIYSIKIJwjLlUU9D5X7xbk2eSuw5YIYFyB2pDoQOzBOg5kxdEQCtViz4IwdV351V4iNmDo8sCNeMel+An+q7zLPihUWmgtIuLyIgltg9Qlx/6H";
     </script>
     
     <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
